@@ -1,0 +1,60 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net7.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>zapret-ui</AssemblyName>
+    <RootNamespace>ZapretUi</RootNamespace>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <LangVersion>11</LangVersion>
+    <ApplicationIcon>app.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <Product>zapret UI</Product>
+    <AssemblyTitle>zapret UI</AssemblyTitle>
+    <Description>Окно управления zapret</Description>
+    <Version>1.0.0</Version>
+    <Copyright>Flowseal</Copyright>
+
+    <!-- Одно exe со встроенным рантаймом: пользователю ничего устанавливать не нужно -->
+    <SelfContained>true</SelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <PublishSingleFile>true</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <!-- Без сжатия: сборки маппятся прямо из exe (файловые страницы) — память в диспетчере задач
+         вдвое меньше, чем со сжатием (53 МБ против 114). Плата — размер файла ~150 МБ -->
+    <EnableCompressionInSingleFile>false</EnableCompressionInSingleFile>
+    <!-- ReadyToRun с single-file на SDK 7.0.x ломает DWriteFactory (dotnet/wpf#5316) -->
+    <PublishReadyToRun>false</PublishReadyToRun>
+
+    <!-- Выключение неиспользуемых подсистем рантайма — меньше память -->
+    <DebuggerSupport>false</DebuggerSupport>
+    <EnableUnsafeBinaryFormatterSerialization>false</EnableUnsafeBinaryFormatterSerialization>
+    <UseSystemResourceKeys>true</UseSystemResourceKeys>
+    <EventSourceSupport>false</EventSourceSupport>
+    <EnableUnsafeUTF7Encoding>false</EnableUnsafeUTF7Encoding>
+    <MetadataUpdaterSupport>false</MetadataUpdaterSupport>
+    <!-- Режим экономии памяти GC: агрессивнее возвращает память ОС -->
+    <GCConserveMemory>5</GCConserveMemory>
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);SYSLIB0014</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="app.ico" />
+    <EmbeddedResource Include="app.ico" />
+    <!-- Отладочный харнес probe и загрузчик не входят в приложение -->
+    <Compile Remove="probe\**" />
+    <EmbeddedResource Remove="probe\**" />
+    <None Remove="probe\**" />
+    <Page Remove="probe\**" />
+    <Compile Remove="Bootstrapper\**" />
+    <EmbeddedResource Remove="Bootstrapper\**" />
+    <None Remove="Bootstrapper\**" />
+    <Page Remove="Bootstrapper\**" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,382 @@
+<Window x:Class="ZapretUi.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="zapret" Width="1090" Height="720" MinWidth="820" MinHeight="560"
+        WindowStartupLocation="CenterScreen" Background="{DynamicResource Bg}"
+        FontFamily="Segoe UI" FontSize="13" Foreground="{DynamicResource Text}">
+  <DockPanel>
+    <Border DockPanel.Dock="Top" Padding="16,12,16,0">
+      <DockPanel>
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" VerticalAlignment="Center">
+          <TextBlock Text="zapret" FontSize="17" FontWeight="SemiBold"/>
+          <TextBlock x:Name="TxtVersion" Margin="8,0,0,0" Foreground="{DynamicResource Muted}" VerticalAlignment="Bottom" Padding="0,0,0,2"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+          <Button x:Name="BtnUpdate" Style="{StaticResource Primary}" Tag="&#xE896;" Height="26" FontSize="12" Margin="0,0,6,0" Visibility="Collapsed"/>
+          <Border x:Name="PillWinws" Style="{StaticResource Pill}"><TextBlock x:Name="PillWinwsText" FontSize="12"/></Border>
+          <Border x:Name="PillDivert" Style="{StaticResource Pill}"><TextBlock x:Name="PillDivertText" FontSize="12"/></Border>
+          <Border x:Name="PillService" Style="{StaticResource Pill}"><TextBlock x:Name="PillServiceText" FontSize="12"/></Border>
+          <Border x:Name="PillTg" Style="{StaticResource Pill}" Visibility="Collapsed"><TextBlock x:Name="PillTgText" FontSize="12"/></Border>
+        </StackPanel>
+      </DockPanel>
+    </Border>
+
+    <Border DockPanel.Dock="Top" Style="{StaticResource Card}" Margin="12,12,12,0">
+      <Grid>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*"/>
+          <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        <StackPanel VerticalAlignment="Center">
+          <TextBlock x:Name="TxtActiveLabel" Text="Активная стратегия" Style="{StaticResource Label}" FontSize="12"/>
+          <TextBlock x:Name="TxtActive" FontSize="18" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+          <TextBlock x:Name="TxtActiveSub" Foreground="{DynamicResource Muted}" FontSize="12" TextTrimming="CharacterEllipsis"/>
+        </StackPanel>
+        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+          <ComboBox x:Name="CbStrategy" Width="250" ToolTipService.ShowOnDisabled="True"/>
+          <Button x:Name="BtnStart" Style="{StaticResource Primary}" Tag="&#xE768;" Content="Запустить"/>
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <TabControl x:Name="Tabs" Margin="12" Padding="0" Background="Transparent" BorderThickness="0">
+      <TabItem Header="Тесты">
+        <Grid Margin="0,10,0,0">
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+          </Grid.RowDefinitions>
+          <Border x:Name="TestPanel" Grid.Row="1" Style="{StaticResource Card}" Margin="0,0,0,10" Visibility="Collapsed">
+            <StackPanel>
+              <DockPanel>
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center">
+                  <Button x:Name="BtnToggleLog" Tag="&#xE8A5;" Content="Журнал"/>
+                  <Button x:Name="BtnRunBest" Style="{StaticResource Primary}" Tag="&#xE768;" Content="Запустить лучшую" Visibility="Collapsed"/>
+                  <Button x:Name="BtnCancelTest" Tag="&#xE711;" Content="Прервать"/>
+                  <Button x:Name="BtnHideTest" Tag="&#xE8BB;" Content="Скрыть" Visibility="Collapsed"/>
+                </StackPanel>
+                <StackPanel VerticalAlignment="Center">
+                  <TextBlock x:Name="TxtTestTitle" FontWeight="SemiBold"/>
+                  <TextBlock x:Name="TxtTestSub" Foreground="{DynamicResource Muted}" FontSize="12" TextTrimming="CharacterEllipsis"/>
+                </StackPanel>
+              </DockPanel>
+              <ProgressBar x:Name="PbTest" Margin="0,10,0,0"/>
+              <TextBox x:Name="TbTestLog" Visibility="Collapsed" Height="170" Margin="0,10,0,0" IsReadOnly="True"
+                       FontFamily="Consolas" FontSize="12" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
+                       Background="{DynamicResource SurfaceAlt}" Padding="6"/>
+            </StackPanel>
+          </Border>
+          <DockPanel Margin="0,0,0,10">
+            <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+              <Button x:Name="BtnRunTests" Style="{StaticResource Primary}" Tag="&#xE9D9;" Content="Запустить тест" Margin="0"/>
+              <Button x:Name="BtnTargets" Tag="&#xE8FD;" Content="Настройки теста"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+              <TextBlock Text="Результаты от" Style="{StaticResource Label}" Margin="0,0,8,0"/>
+              <ComboBox x:Name="CbResults" Width="170"/>
+            </StackPanel>
+          </DockPanel>
+          <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*"/>
+              <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Border x:Name="ResultsCard" Style="{StaticResource Card}" Padding="0">
+              <DockPanel>
+                <!-- Шапка в своей скрытой прокрутке: её сдвигают вслед за горизонтальной прокруткой таблицы.
+                     Справа лишние 12 — ширина вертикальной полосы у строк, чтобы крайние положения совпадали -->
+                <Border DockPanel.Dock="Top" BorderBrush="{DynamicResource Border}" BorderThickness="0,0,0,1" Padding="0,8">
+                  <ScrollViewer x:Name="ResultsHeaderScroll" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled" Focusable="False">
+                    <ContentControl x:Name="ResultsHeader" Margin="12,0,24,0"/>
+                  </ScrollViewer>
+                </Border>
+                <ScrollViewer x:Name="ResultsScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                  <StackPanel x:Name="ResultsRows"/>
+                </ScrollViewer>
+              </DockPanel>
+            </Border>
+            <!-- Выезжающая панель: внешняя рамка анимирует ширину 0 <-> 362 и обрезает содержимое,
+                 внутренняя карточка фиксированной ширины прижата влево — поэтому панель «выезжает» и сдвигает таблицу -->
+            <Border x:Name="DetailPanel" Grid.Column="1" Width="0" ClipToBounds="True">
+              <Border Style="{StaticResource Card}" Margin="12,0,0,0" Width="350" HorizontalAlignment="Left">
+                <DockPanel>
+                  <DockPanel DockPanel.Dock="Top">
+                    <Button x:Name="BtnCloseDetail" DockPanel.Dock="Right" Tag="&#xE8BB;" Padding="0" Width="28" Height="28" Margin="8,-3,-4,0"
+                            VerticalAlignment="Top" ToolTip="Свернуть (Esc)"/>
+                    <TextBlock x:Name="DetailTitle" FontSize="15" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" Text="Нажмите на строку стратегии"/>
+                  </DockPanel>
+                  <TextBlock x:Name="DetailSub" DockPanel.Dock="Top" Foreground="{DynamicResource Muted}" FontSize="12" Margin="0,2,0,10" TextWrapping="Wrap"/>
+                  <Button x:Name="BtnStartSelected" DockPanel.Dock="Bottom" Style="{StaticResource Primary}" Tag="&#xE768;" Content="Запустить эту стратегию" Margin="0,10,0,0" HorizontalAlignment="Left" Visibility="Collapsed"/>
+                  <!-- Полоса прокрутки заходит в правый отступ карточки и стоит у самого края.
+                       Visible, а не Auto: место под неё есть всегда, и строки не съезжают вправо, когда прокрутка не нужна
+                       (ползунок при этом не рисуется) -->
+                  <ScrollViewer VerticalScrollBarVisibility="Visible" Margin="0,0,-12,0" Focusable="False" FocusVisualStyle="{x:Null}">
+                    <StackPanel x:Name="DetailRows" Margin="0,0,4,0"/>
+                  </ScrollViewer>
+                </DockPanel>
+              </Border>
+            </Border>
+          </Grid>
+        </Grid>
+      </TabItem>
+
+      <TabItem Header="Списки">
+        <Grid Margin="0,10,0,0">
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+          </Grid.RowDefinitions>
+          <DockPanel Margin="0,0,0,10">
+            <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+              <ComboBox x:Name="CbList" Width="330"/>
+              <TextBlock x:Name="TxtListInfo" Margin="12,0,0,0" VerticalAlignment="Center" Foreground="{DynamicResource Muted}"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+              <Button x:Name="BtnResetList" Tag="&#xE7A7;" Content="Сбросить" ToolTip="Вернуть список, как он сохранён в файле"/>
+              <Button x:Name="BtnSaveList" Tag="&#xE74E;" Content="Сохранить"/>
+            </StackPanel>
+          </DockPanel>
+          <TextBox x:Name="TbList" Grid.Row="1" AcceptsReturn="True" FontFamily="Consolas" FontSize="13"
+                   VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Padding="8"/>
+          <TextBlock x:Name="TxtListMsg" Grid.Row="2" Margin="0,8,0,0" FontSize="12" Foreground="{DynamicResource Muted}" TextWrapping="Wrap"/>
+        </Grid>
+      </TabItem>
+
+      <TabItem Header="История">
+        <Grid Margin="0,10,0,0">
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+          </Grid.RowDefinitions>
+          <DockPanel Margin="0,0,0,10">
+            <TextBlock x:Name="TxtHistoryInfo" DockPanel.Dock="Left" VerticalAlignment="Center" Foreground="{DynamicResource Muted}"/>
+            <Button x:Name="BtnClearHistory" Tag="&#xE74D;" Content="Очистить историю" HorizontalAlignment="Right"/>
+          </DockPanel>
+          <Border Grid.Row="1" Style="{StaticResource Card}" Padding="0">
+            <DockPanel>
+              <Border DockPanel.Dock="Top" BorderBrush="{DynamicResource Border}" BorderThickness="0,0,0,1" Padding="12,8">
+                <ContentControl x:Name="HistoryHeader"/>
+              </Border>
+              <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel x:Name="HistoryRows"/>
+              </ScrollViewer>
+            </DockPanel>
+          </Border>
+        </Grid>
+      </TabItem>
+
+      <TabItem x:Name="TabTg" Header="TG WS Proxy">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+          <StackPanel Margin="0,10,0,0" MaxWidth="720" HorizontalAlignment="Left">
+            <Border Style="{StaticResource Card}">
+              <StackPanel>
+                <DockPanel>
+                  <Border x:Name="TgStatePill" DockPanel.Dock="Right" Style="{StaticResource Pill}" VerticalAlignment="Top"><TextBlock x:Name="TgStateText" FontSize="12"/></Border>
+                  <TextBlock Text="TG WS Proxy" FontSize="14" FontWeight="SemiBold"/>
+                </DockPanel>
+                <TextBlock Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="0,2,0,10"
+                           Text="Локальный прокси для Telegram Desktop от Flowseal: пускает Telegram через WebSocket, чтобы он грузился быстрее и не тормозил. Живёт в трее; там же его меню — настройки, перезапуск, выход."/>
+                <TextBlock x:Name="TgVersion" FontSize="12" TextWrapping="Wrap"/>
+                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                  <Button x:Name="BtnTgDownload" Style="{StaticResource Primary}" Tag="&#xE896;" Content="Скачать" Margin="0,0,6,0"/>
+                  <Button x:Name="BtnTgStart" Tag="&#xE768;" Content="Запустить" Margin="0,0,6,0"/>
+                  <Button x:Name="BtnTgPick" Tag="&#xE8E5;" Content="Указать скачанный файл" Margin="0,0,6,0"
+                          ToolTip="Уже есть TgWsProxy_windows.exe (например, в «Загрузках»)? Окно скопирует его к себе"/>
+                  <Button x:Name="BtnTgCheck" Tag="&#xE72C;" Content="Проверить обновления" Margin="0"/>
+                </StackPanel>
+                <StackPanel x:Name="TgProgressPanel" Visibility="Collapsed" Margin="0,10,0,0">
+                  <TextBlock x:Name="TgProgressText" FontSize="12" Foreground="{DynamicResource Muted}"/>
+                  <ProgressBar x:Name="TgProgress" Margin="0,6,0,0" Maximum="100"/>
+                </StackPanel>
+                <DockPanel x:Name="TgNotePanel" Margin="0,10,0,0" Visibility="Collapsed">
+                  <Button x:Name="BtnTgSwitch" DockPanel.Dock="Right" Tag="&#xE72C;" Content="Перезапустить отсюда" VerticalAlignment="Center"
+                          ToolTip="Закрыть TG WS Proxy, запущенный из другой папки, и запустить копию окна"/>
+                  <TextBlock x:Name="TgNote" FontSize="12" Foreground="{DynamicResource Warn}" TextWrapping="Wrap" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                </DockPanel>
+              </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource Card}" Margin="0,12,0,0">
+              <StackPanel>
+                <TextBlock Text="Подключить Telegram" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,2"/>
+                <TextBlock x:Name="TgConnectInfo" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,10"/>
+                <StackPanel Orientation="Horizontal">
+                  <Button x:Name="BtnTgOpenTg" Style="{StaticResource Primary}" Tag="&#xE8A7;" Content="Открыть в Telegram" Margin="0"/>
+                  <Button x:Name="BtnTgCopy" Tag="&#xE8C8;" Content="Скопировать ссылку"/>
+                </StackPanel>
+              </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource Card}" Margin="0,12,0,0">
+              <StackPanel>
+                <TextBlock Text="Автозапуск и логи" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,10"/>
+                <CheckBox x:Name="ChkTgAutostart" Content="Запускать вместе с Windows"/>
+                <TextBlock Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="26,2,0,12"
+                           Text="Та же галочка, что в настройках самого прокси: запись в автозагрузке Windows. Прокси запустится в трей при входе в систему."/>
+                <StackPanel Orientation="Horizontal">
+                  <Button x:Name="BtnTgLog" Tag="&#xE8A5;" Content="Открыть лог" Margin="0"/>
+                  <Button x:Name="BtnTgFolder" Tag="&#xE8B7;" Content="Папка настроек"/>
+                  <Button x:Name="BtnTgReleases" Tag="&#xE774;" Content="Страница на GitHub"/>
+                </StackPanel>
+              </StackPanel>
+            </Border>
+          </StackPanel>
+        </ScrollViewer>
+      </TabItem>
+
+      <TabItem Header="Настройки">
+        <ScrollViewer x:Name="SettingsScroll" VerticalScrollBarVisibility="Auto">
+          <StackPanel Margin="0,10,0,0" MaxWidth="720" HorizontalAlignment="Left">
+            <Border Style="{StaticResource Card}" Margin="0,0,0,12">
+              <StackPanel>
+                <TextBlock Text="Диагностика" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,2"/>
+                <TextBlock Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,10"
+                           Text="Запустите, если обход перестал работать. Проверяет то же, что пункт Run Diagnostics в service.bat: службу Base Filtering Engine, системный прокси, TCP timestamps, мешающие программы (Adguard, Killer, Check Point, SmartByte, VPN), зашифрованный DNS, файл hosts и другие обходы, которые занимают WinDivert. Выключенные TCP timestamps и зависший WinDivert исправляются сразу. В окне результатов можно удалить конфликтующие службы и очистить кэш Discord."/>
+                <StackPanel Orientation="Horizontal">
+                  <Button x:Name="BtnDiagnostics" Style="{StaticResource Primary}" Tag="&#xE9D9;" Content="Запустить диагностику" Margin="0"/>
+                </StackPanel>
+              </StackPanel>
+            </Border>
+            <Border Style="{StaticResource Card}">
+              <StackPanel>
+                <TextBlock Text="Игровой фильтр и IPset" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,2"/>
+                <TextBlock Text="Настройки zapret: работающая стратегия подхватит их после перезапуска." Foreground="{DynamicResource Muted}" FontSize="12" Margin="0,0,0,10" TextWrapping="Wrap"/>
+                <Grid Margin="0,4">
+                  <Grid.ColumnDefinitions><ColumnDefinition Width="220"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                  <TextBlock Text="Игровой фильтр" Style="{StaticResource Label}"/>
+                  <ComboBox x:Name="CbGame" Grid.Column="1" Width="200" HorizontalAlignment="Left">
+                    <ComboBoxItem Tag="off" Content="Выключен"/>
+                    <ComboBoxItem Tag="all" Content="TCP и UDP"/>
+                    <ComboBoxItem Tag="tcp" Content="Только TCP"/>
+                    <ComboBoxItem Tag="udp" Content="Только UDP"/>
+                  </ComboBox>
+                </Grid>
+                <TextBlock x:Name="TxtGameInfo" Text="Пускает через обход игровые порты для адресов из IPset. Нужен для игр." Foreground="{DynamicResource Muted}" FontSize="12" Margin="220,0,0,10" TextWrapping="Wrap"/>
+                <!-- Диапазоны портов (zapret 1.10.4+): то же, что пункты 5–7 меню Game Filter в service.bat -->
+                <StackPanel x:Name="GameRanges" Margin="0,0,0,10">
+                  <Grid x:Name="GameTcpRow" Margin="0,4">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="220"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                    <TextBlock Text="Порты TCP" Style="{StaticResource Label}"/>
+                    <TextBox x:Name="TbTcpRange" Grid.Column="1" Width="300" HorizontalAlignment="Left" Height="32" Padding="8,0" VerticalContentAlignment="Center" FontFamily="Consolas"/>
+                  </Grid>
+                  <Grid x:Name="GameUdpRow" Margin="0,4">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="220"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                    <TextBlock Text="Порты UDP" Style="{StaticResource Label}"/>
+                    <TextBox x:Name="TbUdpRange" Grid.Column="1" Width="300" HorizontalAlignment="Left" Height="32" Padding="8,0" VerticalContentAlignment="Center" FontFamily="Consolas"/>
+                  </Grid>
+                  <StackPanel Orientation="Horizontal" Margin="220,6,0,0">
+                    <Button x:Name="BtnSavePorts" Tag="&#xE74E;" Content="Сохранить порты" Margin="0"/>
+                    <Button x:Name="BtnResetPorts" Tag="&#xE777;" Content="По умолчанию"/>
+                  </StackPanel>
+                  <TextBlock x:Name="TxtPortsHint" Foreground="{DynamicResource Muted}" FontSize="12" Margin="220,6,0,0" TextWrapping="Wrap"
+                             Text="Порты и диапазоны через запятую, например 1024-1934,1936-65535 или 27015,27036. От 1 до 65535."/>
+                </StackPanel>
+                <Grid Margin="0,4">
+                  <Grid.ColumnDefinitions><ColumnDefinition Width="220"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                  <TextBlock Text="IPset" Style="{StaticResource Label}"/>
+                  <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <ComboBox x:Name="CbIpset" Width="200">
+                      <ComboBoxItem Tag="none" Content="none — выключен"/>
+                      <ComboBoxItem Tag="loaded" Content="loaded — по списку"/>
+                      <ComboBoxItem Tag="any" Content="any — все адреса"/>
+                    </ComboBox>
+                    <Button x:Name="BtnIpsetUpdate" Tag="&#xE896;" Content="Обновить список IPset"/>
+                  </StackPanel>
+                </Grid>
+                <TextBlock x:Name="TxtIpsetInfo" Foreground="{DynamicResource Muted}" FontSize="12" Margin="220,0,0,0" TextWrapping="Wrap"/>
+                <DockPanel x:Name="SettingsMsgPanel" Margin="0,12,0,0" Visibility="Collapsed">
+                  <Button x:Name="BtnApplySettings" DockPanel.Dock="Right" Style="{StaticResource Primary}" Tag="&#xE72C;" Content="Применить сейчас" Height="28"/>
+                  <TextBlock x:Name="TxtSettingsMsg" FontSize="12" Foreground="{DynamicResource Warn}" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                </DockPanel>
+              </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource Card}" Margin="0,12,0,0">
+              <StackPanel>
+                <TextBlock Text="Оформление" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,10"/>
+                <Grid Margin="0,0,0,12">
+                  <Grid.ColumnDefinitions><ColumnDefinition Width="220"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                  <TextBlock Text="Тема" Style="{StaticResource Label}"/>
+                  <ComboBox x:Name="CbTheme" Grid.Column="1" Width="200" HorizontalAlignment="Left">
+                    <ComboBoxItem Tag="system" Content="Как в Windows"/>
+                    <ComboBoxItem Tag="light" Content="Светлая"/>
+                    <ComboBoxItem Tag="dark" Content="Тёмная"/>
+                  </ComboBox>
+                </Grid>
+                <Grid>
+                  <Grid.ColumnDefinitions><ColumnDefinition Width="220"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                  <TextBlock Text="Цвет акцента" Style="{StaticResource Label}"/>
+                  <CheckBox x:Name="ChkSystemAccent" Grid.Column="1" Content="Как в Windows (иначе синий)" VerticalAlignment="Center"/>
+                </Grid>
+              </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource Card}" Margin="0,12,0,0">
+              <StackPanel>
+                <TextBlock Text="Служба" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,10"/>
+                <Border x:Name="ServiceNote" Margin="220,0,0,10" Padding="10,6" CornerRadius="4" Background="{DynamicResource MidBg}" HorizontalAlignment="Left" Visibility="Collapsed">
+                  <TextBlock Foreground="{DynamicResource MidFg}" FontSize="12" TextWrapping="Wrap" MaxWidth="440"
+                             Text="Служба zapret сейчас не установлена, поэтому вопросов не будет: «Запустить» сразу установит службу, а тест запустится без её отключения."/>
+                </Border>
+                <Grid Margin="0,4">
+                  <Grid.ColumnDefinitions><ColumnDefinition Width="220"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                  <TextBlock Text="При смене стратегии" Style="{StaticResource Label}"/>
+                  <CheckBox x:Name="ChkAskBeforeStart" Grid.Column="1" Content="Спрашивать, прежде чем переустановить" VerticalAlignment="Center"/>
+                </Grid>
+                <TextBlock Text="Кнопки «Запустить» ставят выбранную стратегию в службу zapret, чтобы она работала и после перезагрузки. Если служба уже установлена, она переустанавливается с новой стратегией. Если снять галочку, это будет происходить без вопроса."
+                           Foreground="{DynamicResource Muted}" FontSize="12" Margin="220,0,0,10" TextWrapping="Wrap"/>
+                <Grid Margin="0,14,0,4">
+                  <Grid.ColumnDefinitions><ColumnDefinition Width="220"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                  <TextBlock Text="Перед тестом" Style="{StaticResource Label}"/>
+                  <CheckBox x:Name="ChkAskBeforeTest" Grid.Column="1" Content="Спрашивать, прежде чем отключить" VerticalAlignment="Center"/>
+                </Grid>
+                <TextBlock Text="Тест не запускается, пока установлена служба zapret. Окно убирает её на время теста и возвращает с той же стратегией, когда тест закончится. Если снять галочку, это будет происходить без вопроса."
+                           Foreground="{DynamicResource Muted}" FontSize="12" Margin="220,0,0,0" TextWrapping="Wrap"/>
+              </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource Card}" Margin="0,12,0,0">
+              <StackPanel>
+                <TextBlock Text="Обновления" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,10"/>
+                <Grid Margin="0,0,0,4">
+                  <Grid.ColumnDefinitions><ColumnDefinition Width="220"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                  <TextBlock Text="Проверка обновлений" Style="{StaticResource Label}"/>
+                  <CheckBox x:Name="ChkUpdates" Grid.Column="1" Content="Проверять при открытии окна" VerticalAlignment="Center"/>
+                </Grid>
+                <TextBlock Text="Если вышла новая версия, окно покажет это само, без перехода в браузер." Foreground="{DynamicResource Muted}" FontSize="12" Margin="220,0,0,0" TextWrapping="Wrap"/>
+              </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource Card}" Margin="0,12,0,0">
+              <StackPanel>
+                <TextBlock Text="Ярлык" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,2"/>
+                <TextBlock Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,10"
+                           Text="Ярлык «zapret» открывает это окно сразу, без service.bat. После автообновления ярлыки сами переключатся на новую папку."/>
+                <StackPanel Orientation="Horizontal">
+                  <Button x:Name="BtnShortcut" Tag="&#xE8E5;" Content="На рабочий стол" Margin="0"/>
+                  <Button x:Name="BtnShortcutStart" Tag="&#xE71D;" Content="В меню «Пуск»"/>
+                </StackPanel>
+              </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource Card}" Margin="0,12,0,0">
+              <StackPanel>
+                <TextBlock Text="Перенос настроек" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,2"/>
+                <TextBlock Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,10"
+                           Text="Для перехода на новую версию zapret: распакуйте её в новую папку, положите туда zapret-ui, откройте окно оттуда и перенесите свои списки, историю, настройки теста и настройки zapret из старой папки. Экспорт сохраняет то же самое в один .zip — для бэкапа или чтобы поделиться."/>
+                <StackPanel Orientation="Horizontal">
+                  <Button x:Name="BtnExport" Tag="&#xEDE1;" Content="Экспорт" Margin="0"/>
+                  <Button x:Name="BtnImport" Tag="&#xE8B5;" Content="Импорт"/>
+                  <Button x:Name="BtnMigrate" Tag="&#xE8B5;" Content="Перенести из старой версии" ToolTip="Выбрать папку предыдущей версии zapret и забрать оттуда списки, историю и настройки"/>
+                </StackPanel>
+              </StackPanel>
+            </Border>
+          </StackPanel>
+        </ScrollViewer>
+      </TabItem>
+
+    </TabControl>
+  </DockPanel>
+</Window>

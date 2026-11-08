@@ -1,0 +1,24 @@
+# .NET build artifacts
+bin/
+obj/
+out/
+
+# Native launcher build artifacts
+NativeLauncher/payload/
+NativeLauncher/publish/
+NativeLauncher/*.res
+NativeLauncher/*.obj
+
+# Test sandbox (копия zapret для локальной проверки)
+smoketest/
+
+# IDE
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+
+# OS
+Thumbs.db
+.DS_Store
