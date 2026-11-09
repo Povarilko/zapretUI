@@ -188,7 +188,7 @@ int APIENTRY wWinMain(HINSTANCE inst, HINSTANCE prev, PWSTR cmdLine, int show)
     wchar_t root[MAX_PATH];
     GetModuleFileNameW(NULL, root, MAX_PATH);
     wchar_t *slash = wcsrchr(root, L'\\');
-    if (slash) slash[1] = 0;
+    if (slash) *slash = 0; // без слэша в конце: слэш внутри кавычек экранирует их при разборе командной строки
 
     wchar_t cmd[16384];
     _snwprintf_s(cmd, 16384, _TRUNCATE,

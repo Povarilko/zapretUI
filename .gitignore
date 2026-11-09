@@ -11,6 +11,7 @@ NativeLauncher/*.obj
 
 # Test sandbox (копия zapret для локальной проверки)
 smoketest/
+launcher-test*/
 
 # IDE
 .vs/

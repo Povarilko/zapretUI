@@ -12,10 +12,18 @@ namespace ZapretUi
     {
         protected override void OnStartup(StartupEventArgs e)
         {
+            // Диалоги установки показываются раньше главного окна — иначе первый диалог
+            // становится MainWindow и закрытие диалога гасит приложение до его открытия
+            ShutdownMode = ShutdownMode.OnExplicitShutdown;
+
             // Загрузчик запускает приложение из своей папки, передавая папку zapret параметром
             for (int i = 0; i < e.Args.Length - 1; i++)
             {
-                if (e.Args[i].Equals("-ZapretRoot", StringComparison.OrdinalIgnoreCase)) Ctx.Root = e.Args[i + 1].TrimEnd('\\');
+                if (e.Args[i].Equals("-ZapretRoot", StringComparison.OrdinalIgnoreCase))
+                {
+                    try { Ctx.Root = Path.GetFullPath(e.Args[i + 1]).TrimEnd('\\'); }
+                    catch { }
+                }
                 if (e.Args[i].Equals("-Launcher", StringComparison.OrdinalIgnoreCase)) Ctx.LauncherPath = e.Args[i + 1];
             }
             // exe, запущенный через dotnet.exe: ProcessPath указывает на dotnet — берем путь сборки
@@ -75,6 +83,7 @@ namespace ZapretUi
             var main = new MainWindow();
             Ctx.Main = main;
             MainWindow = main;
+            main.Closed += (s, ev) => Shutdown();
             main.Show();
         }
     }
