@@ -62,7 +62,7 @@ namespace ZapretUi
 
             // Тест закончился — возвращаем службу, убранную перед тестом.
             // Первые секунды после запуска пропускаем: процесс теста может ещё не появиться.
-            if (Ctx.UiState.PendingServiceRestore != null && !st.Testing
+            if (Ctx.UiState.PendingServiceRestore != null && !Ctx.AutoTuneActive && !st.Testing
                 && !(Ctx.Run != null && !Ctx.Run.Finished)
                 && DateTime.Now > Ctx.TestStartedAt.AddSeconds(10))
             {

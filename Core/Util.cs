@@ -22,10 +22,19 @@ namespace ZapretUi
 
     public static class Str
     {
-        // Сортировка «по-человечески»: числа в имени сравниваются как числа
+        // Сортировка «по-человечески»: числа в имени сравниваются как числа.
+        // ВАЖНО: как Sort-Object в test zapret.ps1 — лингвистическое сравнение без учёта
+        // регистра и ЗНАКОВ (пробелы, '~', '-', '.' игнорируются): «~auto-1» сортируется
+        // как «auto1» и встаёт раньше «custom», а «general.bat» — после «general (ALT)».
+        // Индексы стратегий для теста считаются этим же порядком — иначе номера съезжают.
         public static string NaturalKey(string name) => Regex.Replace(name, "\\d+", m => m.Value.PadLeft(8, '0'));
 
-        public static int NaturalCompare(string a, string b) => string.CompareOrdinal(NaturalKey(a), NaturalKey(b));
+        public static int NaturalCompare(string a, string b)
+            => string.Compare(NaturalKey(a), NaturalKey(b), System.Globalization.CultureInfo.CurrentCulture,
+                System.Globalization.CompareOptions.IgnoreCase);
+
+        public static readonly System.Collections.Generic.IComparer<string> NaturalComparer =
+            System.Collections.Generic.Comparer<string>.Create(NaturalCompare);
     }
 
     public static class Ui

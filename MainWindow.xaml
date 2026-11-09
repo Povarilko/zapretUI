@@ -71,6 +71,7 @@
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
               <Button x:Name="BtnRunTests" Style="{StaticResource Primary}" Tag="&#xE9D9;" Content="Запустить тест" Margin="0"/>
               <Button x:Name="BtnTargets" Tag="&#xE8FD;" Content="Настройки теста"/>
+              <Button x:Name="BtnAutoTune" Tag="&#xE9CA;" Content="Подбор"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
               <TextBlock Text="Результаты от" Style="{StaticResource Label}" Margin="0,0,8,0"/>

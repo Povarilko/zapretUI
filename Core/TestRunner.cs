@@ -226,7 +226,7 @@ namespace ZapretUi
             return Directory.GetFiles(Ctx.Root, "*.bat")
                 .Where(f => !Path.GetFileName(f).StartsWith("service", StringComparison.OrdinalIgnoreCase))
                 .Select(f => new Strategy { File = new FileInfo(f), Name = Path.GetFileNameWithoutExtension(f) })
-                .OrderBy(s => Str.NaturalKey(s.Name), StringComparer.Ordinal)
+                .OrderBy(s => s.File.Name, Str.NaturalComparer)
                 .ToArray();
         }
 

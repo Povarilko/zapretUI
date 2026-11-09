@@ -25,6 +25,12 @@ namespace ZapretUi
             };
 
             BtnRunTests.Click += (s, e) => Safe.Run(() => { StartTests(); UpdateStatus(); });
+            BtnAutoTune.Click += (s, e) => Safe.Run(() =>
+            {
+                if (Ctx.Run != null && !Ctx.Run.Finished) throw new Exception("Сначала дождитесь окончания текущего теста.");
+                AutoTuneDialog.Show();
+                UpdateStatus();
+            });
             BtnTargets.Click += (s, e) => Safe.Run(() =>
             {
                 if (!TargetsEditorDialog.ShowEditor()) return;

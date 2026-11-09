@@ -62,5 +62,6 @@ namespace ZapretUi
         public static readonly Dictionary<string, string> ResultKinds = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         public static List<string> DiagConflicts = new List<string>();
         public static string PrevUiStateJson = null;
+        public static bool AutoTuneActive = false;
     }
 }
