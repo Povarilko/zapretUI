@@ -20,11 +20,11 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Flowseal"
             VALUE "FileDescription", "zapret UI launcher"
-            VALUE "FileVersion", "1.1.0.0"
+            VALUE "FileVersion", "1.1.1.0"
             VALUE "InternalName", "zapret-ui"
             VALUE "OriginalFilename", "zapret-ui.exe"
             VALUE "ProductName", "zapret UI"
-            VALUE "ProductVersion", "1.1.0.0"
+            VALUE "ProductVersion", "1.1.1.0"
         END
     END
     BLOCK "VarFileInfo"
