@@ -12,6 +12,9 @@ namespace ZapretUi
         public static void Init(Window w)
         {
             if (Ctx.AppIcon != null) w.Icon = Ctx.AppIcon;
+            // Фон темой сразу — иначе первый кадр окна белый
+            if (w.Background == null || w.Background is System.Windows.Media.SolidColorBrush)
+                w.Background = Theme.Pal["Surface"];
             w.SourceInitialized += (s, e) => Theme.SetTitleBar(w);
         }
 

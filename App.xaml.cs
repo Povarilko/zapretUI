@@ -70,6 +70,7 @@ namespace ZapretUi
             Ctx.UiState = UiState.Load();
             Theme.Sync();
 
+
             // Окно лежит без zapret — предлагаем скачать его (или открыть уже установленный)
             if (!Zapret.TestZapretFolder(Ctx.Root))
             {

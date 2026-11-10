@@ -116,6 +116,15 @@ namespace ZapretUi
             BtnImport.Click += (s, e) => Safe.Run(ImportSettings);
             BtnDiagnostics.Click += (s, e) => Safe.Run(() => { DiagnosticsDialog.Show(this); UpdateStatus(); });
 
+            // Обновление самого приложения
+            TxtAppVersion.Text = "Текущая версия: " + AppUpdate.CurrentVersion;
+            BtnAppUpdate.Click += (s, e) => Safe.Run(() => CheckAppUpdate(null));
+            _appUpdateRevert.Tick += (s, e) =>
+            {
+                _appUpdateRevert.Stop();
+                BtnAppUpdate.Content = "Проверить обновления";
+            };
+
             BtnShortcut.Click += (s, e) => Safe.Run(() =>
             {
                 string p = Shortcuts.CreateShortcut(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory));
@@ -192,6 +201,34 @@ namespace ZapretUi
                 TxtSettingsMsg.Text = "Изменения применятся при следующем запуске стратегии.";
                 BtnApplySettings.Visibility = Visibility.Collapsed;
             }
+        }
+
+        // ---------- обновление самого приложения ----------
+
+        readonly System.Windows.Threading.DispatcherTimer _appUpdateRevert =
+            new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromSeconds(6) };
+
+        public void CheckAppUpdate(AppUpdateInfo known)
+        {
+            var info = known ?? AppUpdate.Check();
+            if (info == null)
+            {
+                // Без лишнего окна: результат прямо на кнопке, через несколько секунд подпись вернётся
+                BtnAppUpdate.Content = "У вас установлена последняя версия";
+                _appUpdateRevert.Stop();
+                _appUpdateRevert.Start();
+                return;
+            }
+            var a = MessageDialog.Show(
+                $"Доступна версия zapret UI {info.Version} (у вас {AppUpdate.CurrentVersion}).\n\n" +
+                "Программа скачает обновление, заменит файл в папке zapret и перезапустится. Если скачивание с GitHub недоступно из вашей сети — откройте страницу релиза в браузере.",
+                MessageKind.Question, true, "Обновить", "Позже");
+            if (a != MessageResult.Yes) return;
+            Busy("Скачиваю обновление zapret UI…", () =>
+            {
+                string exe = AppUpdate.DownloadAndPrepare(info);
+                AppUpdate.ReplaceAndRestart(exe);
+            });
         }
 
         // ---------- migration / export / import ----------

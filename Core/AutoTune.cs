@@ -80,11 +80,50 @@ namespace ZapretUi
             return variants;
         }
 
-        // Порядок осей и названия для прогресса
+        // seqovl: шаг наложения паттерна для multisplit/hostfakesplit
+        public static List<string> AxisSeqovl(string args)
+        {
+            var m = Regex.Match(args, @"--dpi-desync-split-seqovl=(\d+)");
+            if (!m.Success) return new List<string>();
+            int cur = int.Parse(m.Groups[1].Value);
+            var set = new HashSet<int>();
+            foreach (var d in new[] { -256, -128, 128, 256 })
+            {
+                int v = cur + d;
+                if (v >= 1) set.Add(v);
+            }
+            return set.OrderBy(v => Math.Abs(v - cur)).Take(4)
+                .Select(v => SetArg(args, "dpi-desync-split-seqovl", v.ToString())).ToList();
+        }
+
+        // Смена «личности» фейка: подставляем другой .bin той же серии из библиотеки bin\
+        public static List<string> AxisPayload(string args)
+        {
+            var variants = new List<string>();
+            if (!Directory.Exists(Ctx.BinDir)) return variants;
+            var m = Regex.Match(args, @"--dpi-desync-(fake-tls|fake-http|fake-quic)=\S*?([\w.-]+\.bin)");
+            if (!m.Success) return variants;
+            string key = "dpi-desync-" + m.Groups[1].Value;
+            string currentName = m.Groups[2].Value;
+            var pm = Regex.Match(currentName, "^(tls_clienthello|quic_initial|stun)");
+            if (!pm.Success) return variants;
+            foreach (var f in Directory.GetFiles(Ctx.BinDir, pm.Groups[1].Value + "_*.bin"))
+            {
+                string name = Path.GetFileName(f);
+                if (string.Equals(name, currentName, StringComparison.OrdinalIgnoreCase)) continue;
+                variants.Add(new Regex(Pattern(key)).Replace(args, "${1}" + name));
+                if (variants.Count >= 4) break;
+            }
+            return variants;
+        }
+
+        // Порядок осей: новые и самые перспективные — первыми
         public static readonly (string Title, Func<string, List<string>> Gen)[] Axes =
         {
-            ("repeats", AxisRepeats),
+            ("пейлоад фейка", AxisPayload),
+            ("seqovl", AxisSeqovl),
             ("метод десинка", AxisMethod),
+            ("repeats", AxisRepeats),
             ("fooling", AxisFooling),
             ("позиция сплита", AxisSplitPos),
         };
@@ -151,7 +190,41 @@ namespace ZapretUi
             var fooling = GetArg(args, "dpi-desync-fooling") ?? "нет";
             var pos = GetArg(args, "dpi-desync-split-pos") ?? "-";
             var repeats = GetArg(args, "dpi-desync-repeats") ?? "1";
-            return $"method={method}, fooling={fooling}, split-pos={pos}, repeats={repeats}";
+            var seqovl = GetArg(args, "dpi-desync-split-seqovl");
+            var m = Regex.Match(args, @"--dpi-desync-(?:fake-tls|fake-http|fake-quic)=\S*?([\w.-]+\.bin)");
+            var payload = m.Success ? Path.GetFileNameWithoutExtension(m.Groups[1].Value) : null;
+            string s = $"method={method}, fooling={fooling}, split-pos={pos}, repeats={repeats}";
+            if (seqovl != null) s += $", seqovl={seqovl}";
+            if (payload != null) s += $", payload={payload}";
+            return s;
+        }
+
+        // Маркер подбора — общий для всех процессов zapret UI: пока файл есть, ни одно
+        // окно не возвращает службу (иначе второй процесс возвращает её посреди чужого подбора)
+        public static string TuneLockFile => Path.Combine(Ctx.UtilsDir, "autotune.lock");
+
+        public static bool TuneLockActive
+        {
+            get
+            {
+                try
+                {
+                    if (!File.Exists(TuneLockFile)) return false;
+                    // Зависший маркер старше 3 часов не считаем
+                    return (DateTime.Now - File.GetLastWriteTime(TuneLockFile)).TotalHours < 3;
+                }
+                catch { return false; }
+            }
+        }
+
+        public static void SetTuneLock(bool on)
+        {
+            try
+            {
+                if (on) File.WriteAllText(TuneLockFile, DateTime.Now.ToString("s"));
+                else if (File.Exists(TuneLockFile)) File.Delete(TuneLockFile);
+            }
+            catch { }
         }
     }
 }

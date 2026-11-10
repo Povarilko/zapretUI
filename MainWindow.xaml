@@ -2,8 +2,9 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="zapret" Width="1090" Height="720" MinWidth="820" MinHeight="560"
-        WindowStartupLocation="CenterScreen" Background="{DynamicResource Bg}"
+        Background="{DynamicResource Bg}"
         FontFamily="Segoe UI" FontSize="13" Foreground="{DynamicResource Text}">
+  <Grid>
   <DockPanel>
     <Border DockPanel.Dock="Top" Padding="16,12,16,0">
       <DockPanel>
@@ -344,9 +345,16 @@
                 <Grid Margin="0,0,0,4">
                   <Grid.ColumnDefinitions><ColumnDefinition Width="220"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                   <TextBlock Text="Проверка обновлений" Style="{StaticResource Label}"/>
-                  <CheckBox x:Name="ChkUpdates" Grid.Column="1" Content="Проверять при открытии окна" VerticalAlignment="Center"/>
+                  <CheckBox x:Name="ChkUpdates" Grid.Column="1" Content="Проверять при открытии приложения" VerticalAlignment="Center"/>
                 </Grid>
-                <TextBlock Text="Если вышла новая версия, окно покажет это само, без перехода в браузер." Foreground="{DynamicResource Muted}" FontSize="12" Margin="220,0,0,0" TextWrapping="Wrap"/>
+                <Grid Margin="0,12,0,0">
+                  <Grid.ColumnDefinitions><ColumnDefinition Width="220"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                  <TextBlock Text="Обновление приложения" Style="{StaticResource Label}"/>
+                  <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <TextBlock x:Name="TxtAppVersion" VerticalAlignment="Center" Foreground="{DynamicResource Muted}" FontSize="12"/>
+                    <Button x:Name="BtnAppUpdate" Tag="&#xE896;" Content="Проверить обновления" Margin="10,0,0,0"/>
+                  </StackPanel>
+                </Grid>
               </StackPanel>
             </Border>
 
@@ -380,4 +388,5 @@
 
     </TabControl>
   </DockPanel>
+  </Grid>
 </Window>

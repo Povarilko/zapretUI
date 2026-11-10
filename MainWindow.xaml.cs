@@ -24,6 +24,15 @@ namespace ZapretUi
         {
             InitializeComponent();
             DialogBase.Init(this);
+            // Фон конкретной кистью темы сразу: без этого первый кадр рисует белым по умолчанию.
+            // Кисть привязана к источнику — при смене темы перекрасится сама
+            Background = Theme.Pal["Bg"];
+            // Окно стартует за экраном и невидимым: там оно рендерится без единого кадра «в прямом
+            // эфире», а на экран переносится уже готовым — белой вспышки нет физически.
+            // Системная заставка при такой схеме не нужна.
+            Opacity = 0;
+            Left = -20000;
+            Top = -20000;
 
             Ctx.Strategies = Zapret.GetStrategies();
             TxtVersion.Text = "v" + Zapret.GetLocalVersion();
@@ -210,8 +219,17 @@ namespace ZapretUi
             Safe.Run(() =>
             {
                 try { Updater.StartUpdateCheck(); } catch { }
+                // Проверка обновления самого окна — в фоне, чтобы не задерживать старт
+                System.Threading.Tasks.Task.Run(() => AppUpdate.Check()).ContinueWith(t =>
+                {
+                    var info = t.Result;
+                    if (info == null || Ctx.Main == null) return;
+                    Ctx.Main.Dispatcher.BeginInvoke(new Action(() => Safe.Run(() => Ctx.Main.CheckAppUpdate(info))));
+                });
                 // Как service.bat при запуске: заготовки пользовательских списков, если их нет
                 try { Zapret.InitializeUserLists(); } catch { }
+                // Остались от подбора, прерванного вместе с окном
+                try { AutoTune.CleanCandidates(); } catch { }
                 // Остался от теста, прерванного вместе с окном
                 try { if (!Zapret.GetState().Testing) Zapret.RemoveBaselineBat(); } catch { }
                 try { Shortcuts.InitializeStartShortcut(); } catch { }
@@ -247,6 +265,17 @@ namespace ZapretUi
                 }
                 _timer.Start();
             });
+            // Заставку прячем после первого отрисованного кадра, но не раньше минимального
+            // времени показа — иначе на быстрых машинах вся инициализация укладывается в один
+            // кадр и заставку не видно вовсе
+            ContentRendered += (s, e) =>
+            {
+                // Первый кадр отрисован за экраном: переносим окно в центр и проявляем
+                Left = (SystemParameters.PrimaryScreenWidth - ActualWidth) / 2;
+                Top = (SystemParameters.PrimaryScreenHeight - ActualHeight) / 2;
+                Opacity = 1;
+                BeginAnimation(OpacityProperty, new System.Windows.Media.Animation.DoubleAnimation(0d, 1d, TimeSpan.FromMilliseconds(200)));
+            };
         }
 
         void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
